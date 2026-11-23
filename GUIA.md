@@ -333,7 +333,7 @@ Esses foram os momentos de "por que não funciona?" — e o que cada um ensinou.
 ```
 app-financas/
 ├── GUIA.md                  ← este guia
-├── LEIA-ME.md               ← como usar o app no dia a dia
+├── README.md               ← como usar o app no dia a dia
 ├── iniciar.bat              ← abre a versão do PC (dois cliques)
 ├── server.js                ← versão do PC (servidor local)
 ├── lambda.js                ← versão da AWS (entrada do Lambda)
@@ -360,7 +360,7 @@ app-financas/
 │   ├── enviar-chaves.js     ← chaves da Pluggy → Parameter Store
 │   ├── definir-senha.js     ← cria/troca a senha do app
 │   ├── comum.js             ← funções usadas pelos scripts
-│   └── LEIA-ME-AWS.md       ← passo a passo da AWS
+│   └── README-AWS.md       ← passo a passo da AWS
 ├── ferramentas/
 │   └── icones-da-foto.ps1   ← transforma a foto da capa nos ícones
 └── dados/                   ← seus dados no PC (não vai pro GitHub)

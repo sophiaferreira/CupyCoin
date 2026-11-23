@@ -11,7 +11,7 @@ console.log(`Conta AWS: ${conta.Account}`);
 
 const config = lerConfiguracao();
 if (!config.configurado) {
-  console.error('✖ O configuracao.env não está preenchido. Preencha antes (veja o LEIA-ME.md).');
+  console.error('✖ O configuracao.env não está preenchido. Preencha antes (veja o README.md).');
   process.exit(1);
 }
 

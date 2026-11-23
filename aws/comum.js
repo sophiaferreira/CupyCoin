@@ -18,7 +18,7 @@ function aws(args, { json = true, silencioso = false, permitirErro = false } = {
   if (json) final.push('--output', 'json');
   const r = spawnSync(exe, final, { encoding: 'utf8', maxBuffer: 50 * 1024 * 1024 });
   if (r.error && r.error.code === 'ENOENT') {
-    console.error('\n✖ O AWS CLI não está instalado. Veja o passo "Instalar o AWS CLI" no aws/LEIA-ME-AWS.md.\n');
+    console.error('\n✖ O AWS CLI não está instalado. Veja o passo "Instalar o AWS CLI" no aws/README-AWS.md.\n');
     process.exit(1);
   }
   if (r.status !== 0) {

@@ -269,7 +269,7 @@ function desenharAvisos() {
   const avisos = [];
   if (estado.demo) {
     avisos.push(`<div class="aviso alerta"><span>👋</span><div><strong>Você está vendo dados de exemplo.</strong>
-      Para ver os seus gastos de verdade, siga o passo a passo do arquivo <code>LEIA-ME.md</code> (na pasta do app) e preencha o
+      Para ver os seus gastos de verdade, siga o passo a passo do arquivo <code>README.md</code> (na pasta do app) e preencha o
       <code>configuracao.env</code>. Depois é só clicar em “Atualizar agora”.</div></div>`);
   }
   if (estado.ultimoErro) {
@@ -279,9 +279,9 @@ function desenharAvisos() {
     if (!item.consentimentoExpiraEm) continue;
     const dias = Math.ceil((new Date(item.consentimentoExpiraEm) - Date.now()) / 86400000);
     if (dias <= 0) {
-      avisos.push(`<div class="aviso erro"><span>🔒</span><div><strong>A autorização de um banco venceu.</strong>Entre no Dashboard da Pluggy e conecte o MeuPluggy de novo (veja “Renovar a autorização” no LEIA-ME).</div></div>`);
+      avisos.push(`<div class="aviso erro"><span>🔒</span><div><strong>A autorização de um banco venceu.</strong>Entre no Dashboard da Pluggy e conecte o MeuPluggy de novo (veja “Renovar a autorização” no README).</div></div>`);
     } else if (dias <= 30) {
-      avisos.push(`<div class="aviso alerta"><span>⏳</span><div><strong>A autorização de um banco vence em ${dias} dia(s).</strong>Renove antes para não parar de atualizar (veja “Renovar a autorização” no LEIA-ME).</div></div>`);
+      avisos.push(`<div class="aviso alerta"><span>⏳</span><div><strong>A autorização de um banco vence em ${dias} dia(s).</strong>Renove antes para não parar de atualizar (veja “Renovar a autorização” no README).</div></div>`);
     }
   }
   if (!estado.demo && !estado.transacoes.length && !estado.ultimoErro) {

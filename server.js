@@ -79,7 +79,7 @@ servidor.listen(porta, '127.0.0.1', () => {
   console.log(`  Abra no navegador: http://localhost:${porta}`);
   console.log(configInicial.configurado
     ? `  Conectado a ${configInicial.itemIds.length} banco(s) pela Pluggy.`
-    : '  (Modo demonstração: dados fictícios. Veja o LEIA-ME.md para conectar seus bancos.)');
+    : '  (Modo demonstração: dados fictícios. Veja o README.md para conectar seus bancos.)');
   console.log('  Para fechar, feche esta janela.');
   console.log('');
   abrirNavegador();
