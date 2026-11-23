@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>CupyCoin 🪙</title>
+  <meta name="theme-color" content="#121211">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CupyCoin">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icone-180.png">
+  <link rel="icon" type="image/png" href="icone-192.png">
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body class="tela-login">
+  <main class="login">
+    <img src="icone-192.png" alt="" width="72" height="72" class="login-icone">
+    <h1>CupyCoin 🪙</h1>
+    <p class="login-texto">Digite sua senha para ver suas finanças.</p>
+    <form id="form-entrar">
+      <input id="senha" class="campo" type="password" autocomplete="current-password" placeholder="Senha" aria-label="Senha" required>
+      <button class="botao" type="submit">Entrar</button>
+    </form>
+    <p id="erro" class="login-erro" role="alert"></p>
+  </main>
+  <script src="entrar.js"></script>
+</body>
+</html>

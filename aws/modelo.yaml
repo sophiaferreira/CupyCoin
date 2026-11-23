@@ -1,0 +1,164 @@
+# Receita da AWS para o CupyCoin (CloudFormation).
+# Este arquivo descreve TUDO o que a AWS precisa criar. O script aws/implantar.js manda ele para a AWS.
+#
+#   Navegador ──https──► Function URL ──► Lambda (o "cérebro": src/app.js)
+#                                          │  ├─► S3: guarda seus dados (meus-dados.json), privado
+#                                          │  └─► Parameter Store: chaves da Pluggy e o hash da senha
+#   EventBridge (todo dia às 7h) ──────────┘  busca as novidades na Pluggy sozinho
+#
+# Tudo foi escolhido para caber nas cotas grátis da AWS.
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CupyCoin - app pessoal de financas
+
+Parameters:
+  PrefixoParametros:
+    Type: String
+    Default: /cupycoin/
+    Description: Onde ficam as chaves no Parameter Store
+
+Resources:
+  # ---------- S3: onde seus dados ficam guardados ----------
+  BucketDados:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain          # se apagar o app, os dados NÃO são apagados junto
+    UpdateReplacePolicy: Retain
+    Properties:
+      PublicAccessBlockConfiguration: # ninguém de fora consegue ler
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      BucketEncryption:               # tudo guardado criptografado
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:        # guarda versões antigas (dá para voltar atrás se algo der errado)
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Id: apagar-versoes-antigas
+            Status: Enabled
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 30
+
+  # ---------- Permissões do Lambda (o que ele pode fazer, e só isso) ----------
+  PapelDaFuncao:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: cupycoin
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: Logs
+                Effect: Allow
+                Action: [logs:CreateLogStream, logs:PutLogEvents]
+                Resource: !GetAtt Logs.Arn
+              - Sid: LerEGuardarDados
+                Effect: Allow
+                Action: [s3:GetObject, s3:PutObject]
+                Resource: !Sub '${BucketDados.Arn}/dados/*'
+              - Sid: VerSeOArquivoExiste
+                Effect: Allow
+                Action: s3:ListBucket
+                Resource: !GetAtt BucketDados.Arn
+              - Sid: LerChaves
+                Effect: Allow
+                Action: ssm:GetParametersByPath
+                Resource:
+                  - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/cupycoin'
+                  - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/cupycoin/*'
+              - Sid: AbrirChavesCriptografadas
+                Effect: Allow
+                Action: kms:Decrypt
+                Resource: '*'
+                Condition:
+                  StringEquals:
+                    kms:ViaService: !Sub 'ssm.${AWS::Region}.amazonaws.com'
+
+  Logs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/cupycoin
+      RetentionInDays: 14             # guarda os registros só por 2 semanas
+
+  # ---------- Lambda: o "cérebro" do app ----------
+  Funcao:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: cupycoin
+      Description: CupyCoin - telas, login e atualizacao pela Pluggy
+      Runtime: nodejs22.x
+      Architectures: [arm64]          # processador mais barato da AWS
+      Handler: lambda.handler
+      Code: app                       # a pasta com o código (o script empacota e envia)
+      MemorySize: 512
+      Timeout: 120                    # a primeira atualização pode demorar um pouco
+      Role: !GetAtt PapelDaFuncao.Arn
+      LoggingConfig:
+        LogGroup: !Ref Logs
+      Environment:
+        Variables:
+          BUCKET_DADOS: !Ref BucketDados
+          PREFIXO_PARAMETROS: !Ref PrefixoParametros
+
+  # ---------- Function URL: o endereço https do app ----------
+  Endereco:
+    Type: AWS::Lambda::Url
+    Properties:
+      TargetFunctionArn: !GetAtt Funcao.Arn
+      AuthType: NONE                  # aberto na internet, mas o próprio app pede senha
+
+  PermissaoEndereco:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref Funcao
+      Action: lambda:InvokeFunctionUrl
+      Principal: '*'
+      FunctionUrlAuthType: NONE
+
+  PermissaoEnderecoInvocar:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref Funcao
+      Action: lambda:InvokeFunction
+      Principal: '*'
+      InvokedViaFunctionUrl: true     # só vale quando o pedido vem pelo endereço do app
+
+  # ---------- EventBridge: atualiza sozinho todo dia ----------
+  AtualizacaoDiaria:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Busca as novidades na Pluggy todo dia as 7h (horario de Brasilia)
+      ScheduleExpression: cron(0 10 * * ? *)   # 10h UTC = 7h em Brasília
+      State: ENABLED
+      Targets:
+        - Id: atualizar
+          Arn: !GetAtt Funcao.Arn
+          Input: '{"acao":"sincronizar"}'
+
+  PermissaoAtualizacao:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref Funcao
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt AtualizacaoDiaria.Arn
+
+Outputs:
+  EnderecoDoApp:
+    Description: Abra este link no Safari do iPhone
+    Value: !GetAtt Endereco.FunctionUrl
+  BucketDados:
+    Description: Bucket onde ficam seus dados
+    Value: !Ref BucketDados

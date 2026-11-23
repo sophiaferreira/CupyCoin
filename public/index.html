@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>CupyCoin 🪙</title>
+  <!-- Para virar "app" na tela de início do iPhone -->
+  <meta name="theme-color" content="#121211">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CupyCoin">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icone-180.png">
+  <link rel="icon" type="image/png" href="icone-192.png">
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="topo-titulo">
+      <h1>CupyCoin 🪙</h1>
+      <span id="status" class="status" aria-live="polite"></span>
+    </div>
+    <div class="topo-acoes">
+      <button id="btn-atualizar" class="botao">
+        <span class="icone-atualizar" aria-hidden="true">↻</span> <span class="texto-atualizar">Atualizar agora</span>
+      </button>
+      <button id="btn-sair" class="botao secundario" hidden>Sair</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="avisos"></div>
+
+    <nav class="mes" aria-label="Escolher mês">
+      <button id="mes-anterior" class="botao-icone" aria-label="Mês anterior">‹</button>
+      <h2 id="mes-titulo"></h2>
+      <button id="mes-seguinte" class="botao-icone" aria-label="Próximo mês">›</button>
+    </nav>
+
+    <section class="kpis" id="kpis" aria-label="Resumo do mês"></section>
+
+    <ul class="insights" id="insights"></ul>
+
+    <div class="grade">
+      <section class="cartao">
+        <div class="cartao-cabecalho">
+          <h3>Gastos por categoria</h3>
+          <span class="dica">Toque numa categoria para ver os gastos dela</span>
+        </div>
+        <div id="categorias"></div>
+      </section>
+
+      <section class="cartao">
+        <div class="cartao-cabecalho">
+          <h3>Gastos nos últimos 6 meses</h3>
+        </div>
+        <div id="historico"></div>
+      </section>
+    </div>
+
+    <section class="cartao" hidden>
+      <div class="cartao-cabecalho">
+        <h3>📈 Investimentos</h3>
+        <span class="dica">Saldos atualizados pela Pluggy uma vez por dia</span>
+      </div>
+      <div id="investimentos"></div>
+    </section>
+
+    <section class="cartao" id="regras-cartao">
+      <div class="cartao-cabecalho">
+        <h3>Minhas regras</h3>
+        <span class="dica">Ensine o app pra onde vai cada nome. Ex.: quando eu receber de “ana” → Contas da casa (desconta da casa)</span>
+      </div>
+      <form class="regra-form" id="regra-form">
+        <label class="regra-rotulo" for="regra-direcao">Quando</label>
+        <select id="regra-direcao" aria-label="Quando a regra vale">
+          <option value="entrada">eu RECEBER dinheiro</option>
+          <option value="saida">eu PAGAR ou ENVIAR</option>
+          <option value="ambas" selected>receber ou pagar</option>
+        </select>
+        <input id="regra-texto" type="text" maxlength="80" placeholder="e o nome tiver… (ex.: maria rosa)" aria-label="Texto que a transação precisa ter" autocomplete="off">
+        <select id="regra-categoria" aria-label="Categoria da regra"></select>
+        <button class="botao" type="submit">Adicionar regra</button>
+      </form>
+      <div class="regra-previa" id="regra-previa" aria-live="polite"></div>
+      <div id="regras"></div>
+    </section>
+  </main>
+
+  <dialog id="dialogo">
+    <form method="dialog" id="dialogo-form">
+      <h3 id="dialogo-titulo"></h3>
+      <div id="dialogo-corpo"></div>
+      <div class="dialogo-botoes" id="dialogo-botoes"></div>
+    </form>
+  </dialog>
+
+  <dialog id="painel" class="painel" aria-labelledby="painel-titulo">
+    <div class="painel-cabecalho">
+      <div>
+        <h3 id="painel-titulo"></h3>
+        <div class="painel-subtitulo" id="painel-subtitulo"></div>
+      </div>
+      <button class="botao-icone" id="painel-fechar" aria-label="Fechar">×</button>
+    </div>
+    <div class="painel-corpo" id="painel-corpo">
+      <div id="painel-resumo"></div>
+      <div id="painel-lista"></div>
+    </div>
+  </dialog>
+
+  <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
+  <div id="toast" class="toast" role="status" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
